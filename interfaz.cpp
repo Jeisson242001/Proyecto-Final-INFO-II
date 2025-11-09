@@ -17,6 +17,9 @@
 
 #include "niveles.h" // dialogo de niveles (archivo nuevo)
 
+#include "GameWindow.h"
+
+
 
 
 class HoverAnimator : public QObject {
@@ -245,5 +248,30 @@ void Interfaz::onBtnNivelesClicked()
 
 void Interfaz::onBtnJugarClicked()
 {
-    onActionJugarTriggered();
+    // Si tienes menuSound (QSoundEffect* menuSound miembro), hacemos fade-out y luego abrimos el nivel.
+    if (menuSound && menuSound->isPlaying()) {
+        QPropertyAnimation *anim = new QPropertyAnimation(menuSound, "volume", this);
+        anim->setDuration(550);
+        anim->setStartValue(menuSound->volume());
+        anim->setEndValue(0.0);
+        connect(anim, &QPropertyAnimation::finished, this, [this, anim]() {
+            if (menuSound) menuSound->stop();
+            anim->deleteLater();
+
+            // abrir GameWindow (el constructor de GameWindow iniciará la música del nivel)
+            GameWindow *gw = new GameWindow(1, this);
+            gw->show();
+            this->hide();
+        });
+        anim->start(QAbstractAnimation::DeleteWhenStopped);
+    } else {
+        // fallback: abrir inmediatamente
+        if (menuSound) menuSound->stop();
+        GameWindow *gw = new GameWindow(1, this);
+        gw->show();
+        this->hide();
+    }
 }
+
+
+
