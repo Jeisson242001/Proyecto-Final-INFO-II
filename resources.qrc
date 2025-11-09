@@ -1,8 +1,26 @@
 <RCC>
     <qresource prefix="/images">
         <file>images/Caratula.jpg</file>
+        <file>images/granade.png</file>
+        <file>images/Soldado1.png</file>
+        <file>images/Soldado2.png</file>
+        <file>images/Soldado.png</file>
+        <file>images/Bala.png</file>
+        <file>images/rifle.png</file>
+        <file>images/fondo_playa.png</file>
+        <file>images/enemigo1.png</file>
+        <file>images/enemigo2.png</file>
+        <file>images/enemigo3.png</file>
+        <file>images/enemigo4.png</file>
+        <file>images/muerte_enemigo1.png</file>
+        <file>images/muerte_enemigo2.png</file>
+        <file>images/muerte_enemigo3.png</file>
     </qresource>
     <qresource prefix="/sound">
         <file>sounds/tema_menu.wav</file>
+        <file>sounds/arma_player.wav</file>
+        <file>sounds/granada.wav</file>
+        <file>sounds/ambiente_playa.wav</file>
+        <file>sounds/muerte_enemigo.wav</file>
     </qresource>
 </RCC>
