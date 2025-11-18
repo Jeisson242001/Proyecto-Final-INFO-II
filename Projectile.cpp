@@ -1,4 +1,5 @@
 #include "Projectile.h"
+#include "EnemyItem.h"
 
 #include <QTimer>
 #include <QGraphicsEllipseItem>
@@ -12,7 +13,10 @@
 #include <QCoreApplication>
 #include <QUrl>
 
+#include <BunkerBossItem.h>
+
 QSoundEffect* ProjectileItem::explosionSound_ = nullptr;
+QPixmap* ProjectileItem::explosionPixmapPtr_ = nullptr;
 
 
 // constructor...
@@ -34,13 +38,26 @@ ProjectileItem::ProjectileItem(double v0, double angleDegrees, QGraphicsScene *s
     connect(timer, &QTimer::timeout, this, &ProjectileItem::onStep);
     timer->start(1000/60);
 
+    // carga perezosa del sprite de explosión (solo después de que exista QApplication)
+    if (!explosionPixmapPtr_) {
+        QPixmap px(":/images/images/granada_explosion.png"); // ajusta ruta si hace falta
+        if (!px.isNull()) {
+            // guardamos en heap un QPixmap ya escalado, listo para reutilizar
+            explosionPixmapPtr_ = new QPixmap(px.scaled(160, 160, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        } else {
+            qDebug() << "Projectile: explosion sprite NOT found at :/images/images/granada_explosion.png";
+            // dejamos explosionPixmapPtr_ == nullptr si no existe
+        }
+    }
+
+
     if (!explosionSound_) {
         explosionSound_ = new QSoundEffect(qApp);
         explosionSound_->setSource(QUrl(QStringLiteral("qrc:/sound/sounds/granada.wav")));
         explosionSound_->setLoopCount(1);
         explosionSound_->setVolume(0.9f);
-        explosionSound_->play();
-        explosionSound_->stop();
+        //explosionSound_->play();
+        //explosionSound_->stop();
     }
 
 }
@@ -63,10 +80,11 @@ void ProjectileItem::onStep()
     setPos(p);
 
     // colisión con suelo (ajusta)
-    if (p.y() >= 480) {
+    if (!exploded_ && p.y() >= 480) {
         explode();
         return;
     }
+
 
     if (elapsed > lifeTime) {
         if (scene_) scene_->removeItem(this);
@@ -76,41 +94,87 @@ void ProjectileItem::onStep()
 
 void ProjectileItem::explode()
 {
+    // guard: si ya explotó, no volver a ejecutar
+    if (exploded_) return;
+    exploded_ = true;
+
+    // parar timer para evitar que onStep vuelva a llamar a explode()
+    if (timer) {
+        timer->stop();
+        disconnect(timer, &QTimer::timeout, this, &ProjectileItem::onStep);
+    }
+
     if (explosionSound_) {
         explosionSound_->play();
     }
 
-    // efecto visual (círculo)
-    QGraphicsEllipseItem *e = new QGraphicsEllipseItem(-160/2, -160/2, 160, 160);
-    e->setPos(pos());
-    e->setBrush(QBrush(QColor(255,140,0,140)));
-    e->setPen(QPen(Qt::NoPen));   // <-- usar QPen explicitamente
-    if (scene_) scene_->addItem(e);
+    // Si tenemos sprite de explosión válido, crear QGraphicsPixmapItem
+    QGraphicsPixmapItem *expSprite = nullptr;
+    if (explosionPixmapPtr_ && !explosionPixmapPtr_->isNull()) {
+        expSprite = new QGraphicsPixmapItem(*explosionPixmapPtr_);
+        expSprite->setOffset(-explosionPixmapPtr_->width()/2, -explosionPixmapPtr_->height()/2);
+        expSprite->setPos(pos());
+        expSprite->setZValue(60);
+        if (scene_) scene_->addItem(expSprite);
+    } else {
+        // fallback visual: el círculo que ya tenías
+        QGraphicsEllipseItem *e = new QGraphicsEllipseItem(-160/2, -160/2, 160, 160);
+        e->setPos(pos());
+        e->setBrush(QBrush(QColor(255,140,0,140)));
+        e->setPen(QPen(Qt::NoPen));
+        if (scene_) scene_->addItem(e);
+        // programar la eliminación del círculo (igual que el sprite)
+        QTimer::singleShot(300, [e]() {
+            if (e->scene()) e->scene()->removeItem(e);
+            delete e;
+        });
+    }
 
-    // daño radial ejemplo
-    double R = 80.0; // radio de explosion
-    double baseDamage = 100.0;
+    // daño radial (igual que antes)
+    const double R = 80.0; // radio de explosion
+    const double baseDamage = 100.0;
 
     if (scene_) {
         QList<QGraphicsItem*> items = scene_->items(QRectF(pos().x()-R, pos().y()-R, R*2, R*2));
         for (QGraphicsItem *it : items) {
-            if (it == this) continue;
-            QPointF center = it->pos();
-            double d = QLineF(center, pos()).length();
-            double factor = 1.0 - (d / R);
-            if (factor <= 0) continue;
-            double damage = baseDamage * factor;
-            qDebug() << "Damage to item" << it << "=" << damage;
-            // si tu EnemyItem tiene método applyDamage, haz dynamic_cast y llama
+            if (!it || it == this) continue;
+            EnemyItem *enemy = dynamic_cast<EnemyItem*>(it);
+            if (enemy && enemy->isAlive()) {
+                QPointF center = enemy->pos();
+                double d = QLineF(center, pos()).length();
+                double factor = 1.0 - (d / R);
+                if (factor <= 0.0) continue;
+                int damage = qMax(1, static_cast<int>(std::round(baseDamage * factor)));
+                enemy->takeDamage(damage, true);
+            }
+
+            // --- AÑADIR ESTE BLOQUE NUEVO ---
+            BunkerBossItem *bunker = dynamic_cast<BunkerBossItem*>(it);
+            if (bunker && bunker->isAlive()) {
+                QPointF center = bunker->pos(); // (O ajusta al centro real)
+                double d = QLineF(center, pos()).length();
+                double factor = 1.0 - (d / R);
+                if (factor <= 0.0) continue;
+
+                int damage = qMax(1, static_cast<int>(std::round(baseDamage * factor)));
+                bunker->takeDamage(damage); // Aplicar daño de explosión
+            }
+            // --- FIN DEL BLOQUE NUEVO ---
         }
     }
 
+    // eliminar la granada (visual y objeto)
     if (scene_) scene_->removeItem(this);
     deleteLater();
 
-    // eliminar visual tras un rato (lambda que no usa receiver)
-    QTimer::singleShot(300, [e]() {
-        if (e->scene()) e->scene()->removeItem(e);
-        delete e;
-    });
+    // eliminar sprite de explosión tras un corto tiempo
+    if (expSprite) {
+        QTimer::singleShot(300, [expSprite]() {
+            if (expSprite->scene()) expSprite->scene()->removeItem(expSprite);
+            delete expSprite;
+        });
+    }
 }
+
+
+
