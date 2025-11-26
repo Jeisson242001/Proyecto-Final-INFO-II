@@ -27,8 +27,15 @@ private:
     double lifeTime = 10.0;
     double elapsed = 0.0;
 
+    // evita explosiones duplicadas
+    bool exploded_ = false;
+
     void explode();
     static QSoundEffect* explosionSound_;
+
+    // puntero estático: se inicializa nulo en tiempo de carga del módulo (no construye QPixmap)
+    static QPixmap *explosionPixmapPtr_;
+
 };
 
 

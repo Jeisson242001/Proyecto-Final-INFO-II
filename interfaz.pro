@@ -10,20 +10,28 @@ CONFIG += c++17
 
 SOURCES += \
     Bullet.cpp \
+    BunkerBossItem.cpp \
     EnemyItem.cpp \
+    FlameArea.cpp \
     GameWindow.cpp \
     PlayerItem.cpp \
     Projectile.cpp \
+    TopDownEnemy.cpp \
+    TopDownPlayerItem.cpp \
     main.cpp \
     interfaz.cpp \
     niveles.cpp
 
 HEADERS += \
     Bullet.h \
+    BunkerBossItem.h \
     EnemyItem.h \
+    FlameArea.h \
     GameWindow.h \
     PlayerItem.h \
     Projectile.h \
+    TopDownEnemy.h \
+    TopDownPlayerItem.h \
     interfaz.h \
     niveles.h
 

@@ -6,12 +6,16 @@
 #include <QObject>
 
 class QSoundEffect; // forward
+class QGraphicsScene;
 
 class BulletItem : public QObject, public QGraphicsPixmapItem {
     Q_OBJECT
 public:
+    enum class Owner { Player, Enemy };
+
     // direction: normalized unit vector; speed: px/s
-    BulletItem(const QPointF &direction, double speed, QGraphicsScene *scene, QGraphicsItem *parent = nullptr);
+    BulletItem(const QPointF &direction, double speed, QGraphicsScene *scene,
+               Owner owner = Owner::Player, QGraphicsItem *parent = nullptr);
     ~BulletItem() override;
 
 public slots:
@@ -25,8 +29,9 @@ private:
     double lifeTime = 2.0;
     double elapsed = 0.0;
 
+    Owner owner_ = Owner::Player;
+
     static QSoundEffect* shotSound_;
 };
-
 
 #endif // BULLET_H

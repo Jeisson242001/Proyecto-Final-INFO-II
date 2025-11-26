@@ -85,8 +85,8 @@ Interfaz::Interfaz(QWidget *parent)
     ui->setupUi(this);
 
     menuSound = new QSoundEffect(this);
-    menuSound->setSource(QUrl("qrc:/sound/sounds/tema_menu.wav"));
-    menuSound->setVolume(0.5); // 0.0 a 1.0
+    menuSound->setSource(QUrl("qrc:/sound/sounds/tema_menu .wav"));
+    menuSound->setVolume(1.0f); // 0.0 a 1.0
     menuSound->setLoopCount(QSoundEffect::Infinite);
     menuSound->play();
 

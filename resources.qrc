@@ -15,12 +15,41 @@
         <file>images/muerte_enemigo1.png</file>
         <file>images/muerte_enemigo2.png</file>
         <file>images/muerte_enemigo3.png</file>
+        <file>images/Soldado_abajo.png</file>
+        <file>images/Soldado4.png</file>
+        <file>images/Soldado_arriba.png</file>
+        <file>images/enemigo_agachado.png</file>
+        <file>images/explosion_enemigo1.png</file>
+        <file>images/explosion_enemigo2.png</file>
+        <file>images/explosion_enemigo3.png</file>
+        <file>images/granada_explosion.png</file>
+        <file>images/vida1.png</file>
+        <file>images/vida2.png</file>
+        <file>images/vida3.png</file>
+        <file>images/vida4.png</file>
+        <file>images/vida5.png</file>
+        <file>images/vida6.png</file>
+        <file>images/Soldado_muerto.png</file>
+        <file>images/bunker_destruido.png</file>
+        <file>images/bunker_disparando.png</file>
+        <file>images/bunker_quieto.png</file>
+        <file>images/fondo_2.png</file>
+        <file>images/flame.png</file>
+        <file>images/enemigo_camina.png</file>
+        <file>images/enemigo_dispara.png</file>
+        <file>images/enemigo_muerto_2.png</file>
+        <file>images/jugador_muerto.png</file>
+        <file>images/jugador_vivo.png</file>
+        <file>images/lanzallamas.png</file>
     </qresource>
     <qresource prefix="/sound">
-        <file>sounds/tema_menu.wav</file>
         <file>sounds/arma_player.wav</file>
         <file>sounds/granada.wav</file>
         <file>sounds/ambiente_playa.wav</file>
-        <file>sounds/muerte_enemigo.wav</file>
+        <file>sounds/muerte-enemigo.wav</file>
+        <file>sounds/arma_enemigo.wav</file>
+        <file>sounds/derrota.wav</file>
+        <file>sounds/tema_menu .wav</file>
+        <file>sounds/lanzallamas.wav</file>
     </qresource>
 </RCC>
