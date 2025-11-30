@@ -15,7 +15,7 @@
 #include <QGraphicsDropShadowEffect>
 #include <QEasingCurve>
 
-#include "niveles.h" // dialogo de niveles (archivo nuevo)
+#include "creditos.h"
 
 #include "GameWindow.h"
 
@@ -85,8 +85,8 @@ Interfaz::Interfaz(QWidget *parent)
     ui->setupUi(this);
 
     menuSound = new QSoundEffect(this);
-    menuSound->setSource(QUrl("qrc:/sound/sounds/tema_menu.wav"));
-    menuSound->setVolume(0.5); // 0.0 a 1.0
+    menuSound->setSource(QUrl("qrc:/sound/sounds/tema_menu .wav"));
+    menuSound->setVolume(1.0f); // 0.0 a 1.0
     menuSound->setLoopCount(QSoundEffect::Infinite);
     menuSound->play();
 
@@ -164,7 +164,7 @@ void Interfaz::setupMenuAndButtons()
     // Crear botones
 
     QPushButton *btnJugar   = new QPushButton(tr("Jugar"), btnContainer);
-    QPushButton *btnNiveles = new QPushButton(tr("Niveles"), btnContainer);
+    QPushButton *btnNiveles = new QPushButton(tr("Creditos"), btnContainer);
 
     // Tamaño y politicas
     btnNiveles->setFixedHeight(52);
@@ -229,8 +229,7 @@ void Interfaz::setupMenuAndButtons()
 // Slots del menú
 void Interfaz::onActionNivelesTriggered()
 {
-    // Abrimos el diálogo de selección de niveles
-    Niveles dlg(this);
+    Creditos dlg(this);
     dlg.exec();
 }
 
